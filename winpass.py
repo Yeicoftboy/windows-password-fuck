@@ -8,6 +8,16 @@ def change_windows_password(username, password):
     password: The new password for the Windows user account.
   """
 
+  # Check if the Windows partition is already mounted.
+  fuser_command = "fuser -v /dev/sda1"
+  output = subprocess.check_output(fuser_command.split()).decode("utf-8")
+
+  # If the Windows partition is already mounted, kill the process that is using it.
+  if output:
+    process_id = output.split()[0]
+    kill_command = "kill {}".format(process_id)
+    subprocess.check_call(kill_command.split())
+
   # Mount the Windows partition.
   sudo_mount_command = "sudo mount /dev/sda1 /mnt"
   subprocess.check_call(sudo_mount_command.split())
